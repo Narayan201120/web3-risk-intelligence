@@ -7,10 +7,13 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 STEPS = [
     "src/ingestion/fetch_coingecko_markets.py",
     "src/ingestion/fetch_defillama_protocols.py",
+    "src/ingestion/fetch_defillama_stablecoins.py",
     "src/processing/process_coingecko_markets.py",
     "src/processing/process_defillama_protocols.py",
+    "src/processing/process_defillama_stablecoins.py",
     "src/analytics/token_liquidity_risk.py",
     "src/analytics/defi_protocol_risk.py",
+    "src/analytics/stablecoin_depeg_risk.py",
 ]
 
 
