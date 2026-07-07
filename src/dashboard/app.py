@@ -75,8 +75,8 @@ with tab_tokens:
         title="Top Token Liquidity Risk Scores",
     )
 
-    st.plotly_chart(fig, use_container_width=True)
-    st.dataframe(token_risk, use_container_width=True, hide_index=True)
+    st.plotly_chart(fig, width="stretch")
+    st.dataframe(token_risk, width="stretch", hide_index=True)
 
 
 with tab_protocols:
@@ -93,8 +93,8 @@ with tab_protocols:
         title="Top DeFi Protocol Risk Scores",
     )
 
-    st.plotly_chart(fig, use_container_width=True)
-    st.dataframe(protocol_risk, use_container_width=True, hide_index=True)
+    st.plotly_chart(fig, width="stretch")
+    st.dataframe(protocol_risk, width="stretch", hide_index=True)
 
 
 with tab_stablecoins:
@@ -118,5 +118,5 @@ with tab_stablecoins:
         title="Top Stablecoin Depeg Risk Scores",
     )
 
-    st.plotly_chart(fig, use_container_width=True)
-    st.dataframe(stablecoin_risk, use_container_width=True, hide_index=True)
+    st.plotly_chart(fig, width="stretch")
+    st.dataframe(stablecoin_risk, width="stretch", hide_index=True)
