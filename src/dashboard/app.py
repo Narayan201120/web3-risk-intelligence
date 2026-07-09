@@ -25,6 +25,7 @@ def load_report(filename: str) -> pd.DataFrame:
 
 
 token_risk = load_report("token_liquidity_risk_top50.csv")
+token_trends = load_report("token_liquidity_risk_trends.csv")
 protocol_risk = load_report("defi_protocol_risk_top50.csv")
 stablecoin_risk = load_report("stablecoin_depeg_risk_top50.csv")
 
@@ -55,8 +56,8 @@ if top_stablecoin is not None:
     )
 
 
-tab_tokens, tab_protocols, tab_stablecoins = st.tabs(
-    ["Token Liquidity", "DeFi Protocols", "Stablecoins"]
+tab_tokens, tab_trends, tab_protocols, tab_stablecoins = st.tabs(
+    ["Token Liquidity", "Risk Trends", "DeFi Protocols", "Stablecoins"]
 )
 
 
@@ -70,13 +71,44 @@ with tab_tokens:
         x="liquidity_risk_score",
         y="symbol",
         orientation="h",
-        hover_data=["name", "market_cap", "total_volume",
-        "volume_to_market_cap_ratio"],
+        hover_data=[
+            "name",
+            "market_cap",
+            "total_volume",
+            "volume_to_market_cap_ratio",
+        ],
         title="Top Token Liquidity Risk Scores",
     )
 
     st.plotly_chart(fig, width="stretch")
     st.dataframe(token_risk, width="stretch", hide_index=True)
+
+
+with tab_trends:
+    st.subheader("Token Liquidity Risk Trends")
+
+    top_trends = token_trends.sort_values(
+        ["risk_score_change", "liquidity_risk_score_latest"],
+        ascending=[False, False],
+    ).head(20)
+
+    fig = px.bar(
+        top_trends.sort_values("risk_score_change"),
+        x="risk_score_change",
+        y="symbol_latest",
+        orientation="h",
+        hover_data=[
+            "name_latest",
+            "liquidity_risk_score_previous",
+            "liquidity_risk_score_latest",
+            "market_cap_change_pct",
+            "volume_change_pct",
+        ],
+        title="Largest Token Liquidity Risk Increases",
+    )
+
+    st.plotly_chart(fig, width="stretch")
+    st.dataframe(token_trends, width="stretch", hide_index=True)
 
 
 with tab_protocols:
