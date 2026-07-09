@@ -10,3 +10,4 @@ data/processed_snapshots/
 reports/*.csv
 
 .env
+PROGRESS.md
