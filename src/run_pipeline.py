@@ -12,6 +12,7 @@ STEPS = [
     "src/processing/process_defillama_protocols.py",
     "src/processing/process_defillama_stablecoins.py",
     "src/analytics/token_liquidity_risk.py",
+    "src/analytics/token_liquidity_risk_trends.py",
     "src/analytics/defi_protocol_risk.py",
     "src/analytics/stablecoin_depeg_risk.py",
     "src/quality/check_outputs.py",
