@@ -5,6 +5,7 @@ __pycache__/
 data/raw/
 data/processed/
 data/processes/
+data/processed_snapshots/
 
 reports/*.csv
 

@@ -38,6 +38,8 @@ def save_raw_json(data: dict, output_dir: Path) -> Path:
 def main() -> None:
     data = fetch_stablecoins()
     output_path = save_raw_json(data, Path("data/raw/defillama/stablecoins"))
+    print(f"Saved {len(data.get('peggedAssets', []))} records to {output_path}")
+
 
 if __name__ == "__main__":
     main()

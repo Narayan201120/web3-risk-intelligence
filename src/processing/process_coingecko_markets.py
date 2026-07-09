@@ -79,22 +79,33 @@ def normalize_markets(payload: dict) -> pd.DataFrame:
     return df
 
 
-def save_processed(df: pd.DataFrame, output_dir: Path) -> Path:
+def save_processed(df: pd.DataFrame, output_dir: Path) -> tuple[Path, Path]:
     output_dir.mkdir(parents=True, exist_ok=True)
-    output_path = output_dir / "markets_latest.parquet"
-    df.to_parquet(output_path, index=False)
-    return output_path
+    latest_path = output_dir / "markets_latest.parquet"
+    df.to_parquet(latest_path, index=False)
+    
+    ingested_at = pd.to_datetime(df["ingested_at_utc"].iloc[0])
+    ingestion_date = ingested_at.strftime("%Y-%m-%d")
+    timestamp = ingested_at.strftime("%Y%m%dT%H%M%SZ")
+    
+    snapshot_dir = Path("data/processed_snapshots/coingecko/markets") / (f"ingestion_date={ingestion_date}")
+    snapshot_dir.mkdir(parents=True, exist_ok=True)
+    snapshot_path = snapshot_dir / f"markets_{timestamp}.parquet"
+    df.to_parquet(snapshot_path, index=False)
+    
+    return latest_path, snapshot_path
 
 
 def main() -> None:
     raw_path = get_latest_file(RAW_DIR)
     payload = load_raw_payload(raw_path)
     df = normalize_markets(payload)
-    output_path = save_processed(df, OUTPUT_DIR)
+    latest_path, snapshot_path = save_processed(df, OUTPUT_DIR)
 
     print(f"Loaded raw file: {raw_path}")
     print(f"Processed rows: {len(df)}")
-    print(f"Saved to: {output_path}")
+    print(f"Saved latest to: {latest_path}")
+    print(f"Saved snapshot to: {snapshot_path}")
 
 
 if __name__ == "__main__":
