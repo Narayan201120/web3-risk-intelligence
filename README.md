@@ -58,6 +58,9 @@ Public APIs
 
 ## Architecture
 
+See [docs/architecture.md](docs/architecture.md) for the detailed local,
+cloud, and streaming architecture.
+
 ```text
 src/
   ingestion/     Fetch raw data from public APIs
@@ -108,6 +111,7 @@ The pipeline generates:
 
 ```text
 reports/token_liquidity_risk_top50.csv
+reports/token_liquidity_risk_trends.csv
 reports/defi_protocol_risk_top50.csv
 reports/stablecoin_depeg_risk_top50.csv
 ```
@@ -166,9 +170,9 @@ This project demonstrates:
 
 ## Planned Next Steps
 
-- Add historical snapshots for trend analysis
 - Add dashboard screenshots to the README
 - Add sample output files for reviewers
+- Add DeFi protocol and stablecoin trend reports
 - Add cloud storage and warehouse support
 - Add real-time exchange trade ingestion
 - Add on-chain wallet and token transfer data
