@@ -11,7 +11,7 @@ across exchanges, protocols, chains, and token systems. This project turns publi
 Web3 data into structured analytics that can help identify liquidity stress,
 DeFi protocol drawdowns, and stablecoin depeg events.
 
- ## Dashboard Preview
+## Dashboard Preview
 
 ![Web3 Risk Intelligence Dashboard](docs/images/dashboard.png)
 
@@ -118,6 +118,7 @@ The pipeline generates:
 reports/token_liquidity_risk_top50.csv
 reports/token_liquidity_risk_trends.csv
 reports/defi_protocol_risk_top50.csv
+reports/defi_protocol_risk_trends.csv
 reports/stablecoin_depeg_risk_top50.csv
 ```
 
@@ -132,6 +133,7 @@ report shape without running the pipeline:
 examples/token_liquidity_risk_sample.csv
 examples/token_liquidity_risk_trends_sample.csv
 examples/defi_protocol_risk_sample.csv
+examples/defi_protocol_risk_trends_sample.csv
 examples/stablecoin_depeg_risk_sample.csv
 ```
 
@@ -187,8 +189,7 @@ This project demonstrates:
 
 ## Planned Next Steps
 
-- Add dashboard screenshots to the README
-- Add DeFi protocol and stablecoin trend reports
+- Add stablecoin trend report
 - Add cloud storage and warehouse support
 - Add real-time exchange trade ingestion
 - Add on-chain wallet and token transfer data
