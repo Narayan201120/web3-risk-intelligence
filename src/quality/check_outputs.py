@@ -15,6 +15,7 @@ REPORT_FILES = {
     "defi_protocol_risk": Path("reports/defi_protocol_risk_top50.csv"),
     "stablecoin_depeg_risk": Path("reports/stablecoin_depeg_risk_top50.csv"),
     "token_liquidity_risk_trends": Path("reports/token_liquidity_risk_trends.csv"),
+    "defi_protocol_risk_trends": Path("reports/defi_protocol_risk_trends.csv"),
 }
 
 def assert_file_exists(path: Path) -> None:
@@ -56,6 +57,7 @@ def main() -> None:
         "defi_protocol_risk": "protocol_risk_score",
         "stablecoin_depeg_risk": "depeg_risk_score",
         "token_liquidity_risk_trends": "risk_score_change",
+        "defi_protocol_risk_trends": "risk_score_change",
     }
     
     for name, path in REPORT_FILES.items():
