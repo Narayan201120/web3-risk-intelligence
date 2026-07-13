@@ -11,6 +11,11 @@ across exchanges, protocols, chains, and token systems. This project turns publi
 Web3 data into structured analytics that can help identify liquidity stress,
 DeFi protocol drawdowns, and stablecoin depeg events.
 
+ ## Dashboard Preview
+
+![Web3 Risk Intelligence Dashboard](docs/images/dashboard.png)
+
+
 ## Project Goal
 
 The goal is to build a real Web3 data platform that can monitor:
