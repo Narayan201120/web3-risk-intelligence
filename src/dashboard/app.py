@@ -27,6 +27,7 @@ def load_report(filename: str) -> pd.DataFrame:
 token_risk = load_report("token_liquidity_risk_top50.csv")
 token_trends = load_report("token_liquidity_risk_trends.csv")
 protocol_risk = load_report("defi_protocol_risk_top50.csv")
+protocol_trends = load_report("defi_protocol_risk_trends.csv")
 stablecoin_risk = load_report("stablecoin_depeg_risk_top50.csv")
 
 
@@ -56,8 +57,16 @@ if top_stablecoin is not None:
     )
 
 
-tab_tokens, tab_trends, tab_protocols, tab_stablecoins = st.tabs(
-    ["Token Liquidity", "Risk Trends", "DeFi Protocols", "Stablecoins"]
+tab_tokens, tab_token_trends, tab_protocols, tab_protocol_trends, tab_stablecoins = (
+    st.tabs(
+        [
+            "Token Liquidity",
+            "Token Trends",
+            "DeFi Protocols",
+            "Protocol Trends",
+            "Stablecoins",
+        ]
+    )
 )
 
 
@@ -84,7 +93,7 @@ with tab_tokens:
     st.dataframe(token_risk, width="stretch", hide_index=True)
 
 
-with tab_trends:
+with tab_token_trends:
     st.subheader("Token Liquidity Risk Trends")
 
     top_trends = token_trends.sort_values(
@@ -127,6 +136,35 @@ with tab_protocols:
 
     st.plotly_chart(fig, width="stretch")
     st.dataframe(protocol_risk, width="stretch", hide_index=True)
+
+
+with tab_protocol_trends:
+    st.subheader("DeFi Protocol Risk Trends")
+
+    top_protocol_trends = protocol_trends.sort_values(
+        ["risk_score_change", "protocol_risk_score_latest"],
+        ascending=[False, False],
+    ).head(20)
+
+    fig = px.bar(
+        top_protocol_trends.sort_values("risk_score_change"),
+        x="risk_score_change",
+        y="name_latest",
+        orientation="h",
+        hover_data=[
+            "chain_latest",
+            "category_latest",
+            "protocol_risk_score_previous",
+            "protocol_risk_score_latest",
+            "tvl_previous",
+            "tvl_latest",
+            "tvl_change_pct",
+        ],
+        title="Largest DeFi Protocol Risk Increases",
+    )
+
+    st.plotly_chart(fig, width="stretch")
+    st.dataframe(protocol_trends, width="stretch", hide_index=True)
 
 
 with tab_stablecoins:
