@@ -1,0 +1,11 @@
+market_cap_rank,id,symbol,name,current_price,market_cap,total_volume,volume_to_market_cap_ratio,price_change_percentage_24h,price_change_percentage_7d,circulating_supply_ratio,liquidity_risk_score
+48,memecore,m,MemeCore,1.17,1547763060,13916190.0,0.009,-11.71,-22.18,0.2453,75
+180,unibase,ub,Unibase,0.070572,175230795,8365058.0,0.0477,-12.09,-22.55,0.25,48
+140,lab,lab,LAB,0.836127,261697668,290264086.0,1.1092,-57.72,-90.93,0.3125,40
+185,velvet,velvet,Velvet,0.401774,169264394,8263968.0,0.0488,-7.89,-24.24,0.4208,38
+81,adi-token,adi,ADI,6.01,755215640,1398703.0,0.0019,2.14,7.19,0.1253,35
+90,audiera,beat,Audiera,2.16,668039019,15138518.0,0.0227,-2.59,-23.95,0.3093,35
+106,hash-2,hash,Provenance Blockchain,0.00891906,491464204,8960.19,0.0,-5.32,0.5,0.5802,35
+183,wefi,wfi,WeFi,2.02,172982016,1642321.0,0.0095,-0.48,-1.08,0.0856,35
+243,pearl-2,prl,Pearl,0.469613,113071283,657129.0,0.0058,-0.04,2.37,0.1147,35
+175,ethgas-2,gwei,ETHGas,0.087257,182018121,9747805.0,0.0536,-0.15,-33.44,0.21,30

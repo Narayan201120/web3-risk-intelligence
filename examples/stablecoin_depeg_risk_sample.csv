@@ -1,0 +1,11 @@
+name,symbol,pegMechanism,price,absolute_depeg,circulating_usd,supply_change_1d_pct,supply_change_7d_pct,chain_count,depeg_risk_score
+Citrea USD,ctUSD,fiat-backed,,,14277790.61,-40.21,-40.21,1,75
+Hyperbeat USD,beatUSD,fiat-backed,,,1711205.12,-21.59,8.08,1,55
+Deaderal Reserve Note,USDeAD,crypto-backed,,,2246.19,0.0,-46.2,11,50
+Classic USD,USC,fiat-backed,,,0.5,0.0,-100.0,2,50
+GRAI,GRAI,crypto-backed,0.39416422717534194,0.605836,147675.18,0.0,-12.15,7,46
+pmUSD,pmUSD,crypto-backed,0.754362865142581,0.245637,70911017.29,0.0,0.0,1,45
+USP,USP,crypto-backed,1.1065407586426241,0.106541,8616596.67,-0.0,-0.24,1,45
+StablR USD,USDR,fiat-backed,0.29311801922760117,0.706882,1976831.65,0.0,0.0,1,45
+Solayer USD,sUSD,fiat-backed,1.11164066509246,0.111641,984810.57,-0.01,-0.17,1,45
+Fathom Dollar,FXD,crypto-backed,0.8931197106344798,0.10688,705872.92,0.0,0.0,1,45

@@ -118,6 +118,18 @@ reports/stablecoin_depeg_risk_top50.csv
 
 These files are ignored by git because they are generated outputs.
 
+## Example Outputs
+
+Small sample outputs are committed under `examples/` so reviewers can inspect the
+report shape without running the pipeline:
+
+```text
+examples/token_liquidity_risk_sample.csv
+examples/token_liquidity_risk_trends_sample.csv
+examples/defi_protocol_risk_sample.csv
+examples/stablecoin_depeg_risk_sample.csv
+```
+
 ## How To Run
 
 Create and activate a virtual environment:
@@ -171,7 +183,6 @@ This project demonstrates:
 ## Planned Next Steps
 
 - Add dashboard screenshots to the README
-- Add sample output files for reviewers
 - Add DeFi protocol and stablecoin trend reports
 - Add cloud storage and warehouse support
 - Add real-time exchange trade ingestion

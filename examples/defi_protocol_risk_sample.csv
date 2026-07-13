@@ -1,0 +1,11 @@
+name,symbol,chain,category,tvl,change_1d,change_7d,audits,tvl_to_mcap_ratio,protocol_risk_score,url
+Bitzy,-,Botanix,Dexs,0.0,-100.0,-100.0,0.0,,85,https://bitzy.app/
+Arch Swap,-,Botanix,Dexs,0.0,-100.0,-100.0,0.0,,85,
+Offshore Protocol,DIRTY,MegaETH,Gamified Mining,29551.38,-58.06,-53.2,0.0,,80, 
+QIELend,-,QIE,Lending,241.39,-95.34,-97.94,0.0,,80,https://www.qielend.qie.digital/
+YieldCore,-,Binance,Yield,233.26,-78.96,-79.51,0.0,,80,https://yieldcore.app
+Mint Bridge,-,Ethereum,Canonical Bridge,0.01,-95.7,-99.63,0.0,,80,https://bridge.mintchain.io/
+Eventum Bridge,-,Arbitrum,Canonical Bridge,0.0,-100.0,-100.0,0.0,,80,https://evedex.com/en-US/
+EagleFi,-,Massa,Dexs,0.0,-100.0,-100.0,2.0,,75,https://www.eaglefi.io/
+Synatra,-,Solana,Yield Aggregator,0.0,-100.0,-100.0,2.0,,75,https://synatra.xyz
+Nerona,-,Multi-Chain,Yield Aggregator,3122856.41,-24.61,-51.9,0.0,,70, 
