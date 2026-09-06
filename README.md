@@ -45,6 +45,8 @@ into a cloud-based batch and streaming platform.
 - Generates local risk alerts with optional webhook delivery
 - Provides a separate fresh-snapshot risk sentinel for sudden price, TVL, and
   stablecoin peg shocks
+- Builds a time-safe stablecoin forecast readiness report without claiming
+  validation before enough history exists
 - Runs pipeline quality checks
 - Includes automated processor, analytics, and pipeline tests
 - Provides an interactive Streamlit dashboard
@@ -66,6 +68,7 @@ Public APIs
   -> Unified risk observations
   -> Optional risk alerts
   -> Optional high-frequency risk sentinel
+  -> Forecast readiness and calibrated forecast output
   -> Streamlit dashboard
   -> Run manifest and quality checks
 ```
@@ -131,6 +134,8 @@ reports/defi_protocol_risk_trends.csv
 reports/stablecoin_depeg_risk_top50.csv
 reports/stablecoin_depeg_risk_trends.csv
 reports/risk_alerts_latest.csv
+reports/stablecoin_forecast_readiness.json
+reports/stablecoin_forecast_latest.csv
 ```
 
 These files are ignored by git because they are generated outputs.
@@ -214,6 +219,11 @@ threshold-crossing events to `RISK_SENTINEL_WEBHOOK_URL`. It is designed for a
 short schedule such as every few minutes. Notification state suppresses
 duplicate webhook deliveries while still publishing the full current event
 set. It does not replace the historical batch pipeline.
+
+The forecast path is included in the full pipeline. It labels future stablecoin
+depeg events from later snapshots, evaluates whether the history is sufficient,
+and writes `insufficient_data` until the minimum history and event coverage are
+available. It will not publish forecast probabilities in that state.
 
 ## Deployment
 

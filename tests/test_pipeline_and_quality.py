@@ -8,15 +8,20 @@ def test_pipeline_includes_stablecoin_trends_before_quality_checks() -> None:
     trend_step = "src/analytics/stablecoin_depeg_risk_trends.py"
     observation_step = "src/analytics/build_risk_observations.py"
     alert_step = "src/alerts/emit_risk_alerts.py"
+    forecast_step = "src/forecasting/stablecoin_forecast.py"
 
     assert trend_step in run_pipeline.STEPS
     assert observation_step in run_pipeline.STEPS
     assert alert_step in run_pipeline.STEPS
+    assert forecast_step in run_pipeline.STEPS
     assert run_pipeline.STEPS.index(observation_step) < run_pipeline.STEPS.index(
         alert_step
     )
     assert run_pipeline.STEPS.index(trend_step) < run_pipeline.STEPS.index(
         "src/quality/check_outputs.py"
+    )
+    assert run_pipeline.STEPS.index(alert_step) < run_pipeline.STEPS.index(
+        forecast_step
     )
 
 

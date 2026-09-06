@@ -17,6 +17,7 @@ Public Web3 APIs
   -> DuckDB analytics reports
   -> Unified risk observations
   -> Optional alert webhook
+  -> Forecast readiness and calibrated forecast output
   -> Streamlit dashboard
   -> Quality checks
 ```
@@ -115,6 +116,11 @@ Current reports:
 The analytics layer also writes the cross-source observation table to
 `data/processed/risk_observations_latest.parquet` and timestamped observation
 snapshots under `data/processed_snapshots/risk_observations/`.
+
+The forecasting layer currently builds a time-safe stablecoin depeg dataset
+from later snapshots. It publishes a readiness report and only emits forecast
+probabilities after minimum history, event coverage, and temporal holdout
+requirements are met. Until then, the readiness status is `insufficient_data`.
 
 ## Dashboard Layer
 

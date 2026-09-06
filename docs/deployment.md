@@ -129,6 +129,10 @@ hourly or daily collection. Alert on:
 The local `src/quality/check_outputs.py` script is the baseline gate for the
 same checks in CI and in the scheduled job.
 
+The forecast readiness report is also quality-checked. A forecast with
+`insufficient_data` is an expected safe state; a report marked `ready` must
+contain forecast rows and temporal validation metrics.
+
 ## Streaming phase boundary
 
 Streaming exchange trades, order books, or blockchain events should be added as

@@ -23,7 +23,10 @@ REPORT_FILES = {
         "reports/stablecoin_depeg_risk_trends.csv"
     ),
     "risk_alerts": Path("reports/risk_alerts_latest.csv"),
+    "stablecoin_forecast": Path("reports/stablecoin_forecast_latest.csv"),
 }
+
+FORECAST_READINESS_PATH = Path("reports/stablecoin_forecast_readiness.json")
 
 OBSERVATION_COLUMNS = {
     "pipeline_run_id",
@@ -97,6 +100,34 @@ def assert_pipeline_manifest_ready() -> None:
     ]
     if failed_steps:
         raise ValueError(f"Previous pipeline steps failed: {failed_steps}")
+
+
+def assert_forecast_readiness() -> None:
+    assert_file_exists(FORECAST_READINESS_PATH)
+    report = json.loads(FORECAST_READINESS_PATH.read_text(encoding="utf-8"))
+    if report.get("status") not in {"ready", "insufficient_data"}:
+        raise ValueError(
+            "Stablecoin forecast readiness has an invalid status: "
+            f"{report.get('status')}"
+        )
+    for field in [
+        "snapshot_count",
+        "distinct_observation_dates",
+        "labeled_rows",
+        "positive_events",
+        "reasons",
+        "forecast_rows",
+    ]:
+        if field not in report:
+            raise ValueError(
+                f"Stablecoin forecast readiness missing field: {field}"
+            )
+    if report["status"] == "ready" and report["forecast_rows"] == 0:
+        raise ValueError("Ready stablecoin forecast produced no forecast rows")
+    print(
+        "stablecoin_forecast_readiness: "
+        f"{report['status']} ({report['forecast_rows']} forecast rows)"
+    )
     
 def assert_report_valid(
     name: str,
@@ -115,7 +146,12 @@ def assert_report_valid(
     if not df.empty and df[score_column].isna().all():
         raise ValueError(f"{name} score column is entirely null: {score_column}")
 
-    suffix = " (waiting for a second snapshot)" if df.empty else ""
+    if df.empty and name.endswith("_trends"):
+        suffix = " (waiting for a second snapshot)"
+    elif df.empty:
+        suffix = " (empty until forecast readiness is reached)"
+    else:
+        suffix = ""
     print(f"{name}: {len(df)} rows{suffix}")
     
 def main() -> None:
@@ -129,6 +165,7 @@ def main() -> None:
         OBSERVATION_COLUMNS,
     )
     assert_pipeline_manifest_ready()
+    assert_forecast_readiness()
     
     report_score_columns = {
         "token_liquidity_risk": "liquidity_risk_score",
@@ -138,6 +175,7 @@ def main() -> None:
         "defi_protocol_risk_trends": "risk_score_change",
         "stablecoin_depeg_risk_trends": "risk_score_change",
         "risk_alerts": "risk_score",
+        "stablecoin_forecast": "forecast_probability",
     }
 
     for name, path in REPORT_FILES.items():
@@ -146,7 +184,10 @@ def main() -> None:
             name,
             path,
             report_score_columns[name],
-            allow_empty=name.endswith("_trends") or name == "risk_alerts",
+            allow_empty=(
+                name.endswith("_trends")
+                or name in {"risk_alerts", "stablecoin_forecast"}
+            ),
         )
     
     print("\nAll quality checks passed.")

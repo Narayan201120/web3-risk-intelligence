@@ -25,6 +25,7 @@ STEPS = [
     "src/analytics/stablecoin_depeg_risk_trends.py",
     "src/analytics/build_risk_observations.py",
     "src/alerts/emit_risk_alerts.py",
+    "src/forecasting/stablecoin_forecast.py",
     "src/quality/check_outputs.py",
 ]
 
