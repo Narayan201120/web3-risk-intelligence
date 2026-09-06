@@ -29,6 +29,7 @@ the trend reports.
 | Raw | `data/raw/**/*.json` | Cloud Storage raw prefix | Immutable source replay |
 | Latest processed | `data/processed/**/*.parquet` | BigQuery tables or Storage Parquet | Dashboard and current reports |
 | Snapshots | `data/processed_snapshots/**/*.parquet` | Partitioned Storage/BigQuery tables | Historical comparisons |
+| Observations | `data/processed/risk_observations_latest.parquet` | BigQuery table or Storage Parquet | Cross-source risk feed |
 | Reports | `reports/*.csv` | BigQuery views or generated objects | Dashboard-ready risk outputs |
 
 All scheduled jobs should write a timestamped raw payload and a processed
@@ -62,6 +63,12 @@ The scheduled job service account needs:
 
 The dashboard service account needs read-only access to the published report
 prefix. It does not need write access to raw or processed data.
+
+If webhook alerts are enabled, store `RISK_ALERT_WEBHOOK_URL` as a secret on the
+scheduled job. `RISK_ALERT_MIN_SCORE` and `RISK_ALERT_MIN_SCORE_CHANGE` control
+the two alert thresholds. The pipeline sends a JSON payload only when the
+configured alert selection contains rows. Keep webhook delivery outside the
+dashboard service.
 
 No cloud deployment is performed by the local project commands. A GCP project,
 region, bucket, and service-account choice must be supplied before provisioning

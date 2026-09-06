@@ -41,6 +41,8 @@ into a cloud-based batch and streaming platform.
 - Generates DeFi protocol risk reports
 - Generates stablecoin depeg risk reports
 - Generates stablecoin depeg trend reports after the second pipeline run
+- Publishes unified risk observations with asset, score, factor, and run metadata
+- Generates local risk alerts with optional webhook delivery
 - Runs pipeline quality checks
 - Includes automated processor, analytics, and pipeline tests
 - Provides an interactive Streamlit dashboard
@@ -59,8 +61,10 @@ Public APIs
   -> Processed Parquet datasets
   -> DuckDB SQL analytics
   -> CSV risk reports
+  -> Unified risk observations
+  -> Optional risk alerts
   -> Streamlit dashboard
-  -> Quality checks
+  -> Run manifest and quality checks
 ```
 
 ## Architecture
@@ -123,6 +127,7 @@ reports/defi_protocol_risk_top50.csv
 reports/defi_protocol_risk_trends.csv
 reports/stablecoin_depeg_risk_top50.csv
 reports/stablecoin_depeg_risk_trends.csv
+reports/risk_alerts_latest.csv
 ```
 
 These files are ignored by git because they are generated outputs.
@@ -187,6 +192,13 @@ python -m pytest
 The first pipeline run creates the latest reports and schema-valid empty trend
 reports. Trend rows appear automatically after the next run, when two processed
 snapshots are available for comparison.
+
+Each run also writes a manifest under `data/runs/` and a unified observation
+table at `data/processed/risk_observations_latest.parquet`. Set
+`RISK_ALERT_WEBHOOK_URL` before running the pipeline to send alerts to a
+compatible JSON webhook. `RISK_ALERT_MIN_SCORE` defaults to 50 and
+`RISK_ALERT_MIN_SCORE_CHANGE` defaults to 10. Leave the webhook unset for
+local-only alert files.
 
 ## Deployment
 

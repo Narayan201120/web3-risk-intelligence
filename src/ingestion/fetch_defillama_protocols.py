@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from pathlib import Path
 import json
+import os
 import requests
 
 
@@ -23,6 +24,7 @@ def save_raw_json(data: list[dict], output_dir: Path) -> Path:
         "source": "defillama",
         "endpoint": BASE_URL,
         "ingested_at_utc": run_timestamp,
+        "pipeline_run_id": os.getenv("PIPELINE_RUN_ID"),
         "record_count": len(data),
         "data": data,
     }

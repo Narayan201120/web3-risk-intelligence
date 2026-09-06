@@ -1,5 +1,6 @@
 from pathlib import Path
 import json
+import os
 
 import pandas as pd
 
@@ -51,6 +52,11 @@ def normalize_protocols(payload: dict) -> pd.DataFrame:
     df = df[available_columns].copy()
 
     df["ingested_at_utc"] = payload["ingested_at_utc"]
+    df["pipeline_run_id"] = (
+        payload.get("pipeline_run_id")
+        or os.getenv("PIPELINE_RUN_ID")
+        or f"manual_{payload['ingested_at_utc']}"
+    )
 
     numeric_columns = [
         "id",

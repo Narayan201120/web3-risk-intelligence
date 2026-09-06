@@ -31,6 +31,7 @@ def test_normalize_markets_keeps_numeric_metrics_numeric() -> None:
     assert result.loc[0, "current_price"] == 1.25
     assert result.loc[0, "market_cap"] == 1_000_000
     assert result.loc[0, "ingested_at_utc"] == "20260713T145106Z"
+    assert result.loc[0, "pipeline_run_id"] == "manual_20260713T145106Z"
     assert pd.api.types.is_numeric_dtype(result["total_volume"])
 
 

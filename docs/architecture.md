@@ -15,6 +15,8 @@ Public Web3 APIs
   -> Processed Parquet latest tables
   -> Processed Parquet historical snapshots
   -> DuckDB analytics reports
+  -> Unified risk observations
+  -> Optional alert webhook
   -> Streamlit dashboard
   -> Quality checks
 ```
@@ -108,6 +110,11 @@ Current reports:
 - `defi_protocol_risk_top50.csv`
 - `stablecoin_depeg_risk_top50.csv`
 - `stablecoin_depeg_risk_trends.csv`
+- `risk_alerts_latest.csv`
+
+The analytics layer also writes the cross-source observation table to
+`data/processed/risk_observations_latest.parquet` and timestamped observation
+snapshots under `data/processed_snapshots/risk_observations/`.
 
 ## Dashboard Layer
 
@@ -118,6 +125,7 @@ The Streamlit dashboard reads generated CSV reports and exposes:
 - DeFi protocol risk rankings
 - Stablecoin depeg risk rankings
 - Stablecoin depeg risk trends
+- Current risk alerts and their contributing factors
 
 ## Quality Layer
 
@@ -128,6 +136,8 @@ The quality check script validates that:
 - Expected report files exist
 - Report score columns exist
 - Report score columns are not fully null
+- Unified observation columns are present
+- The current pipeline run has a matching manifest
 
 ## Current Pipeline Orchestration
 
@@ -137,8 +147,9 @@ The full local pipeline is run by:
 python src\run_pipeline.py
 ```
 
-The runner executes ingestion, processing, analytics, and quality checks in a
-fixed order. If any step fails, the pipeline stops.
+The runner executes ingestion, processing, analytics, observation building,
+alert generation, and quality checks in a fixed order. It records each step in
+a run manifest and stops on failure.
 
 ## Future Cloud Architecture
 

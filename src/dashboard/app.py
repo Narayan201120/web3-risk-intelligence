@@ -153,6 +153,7 @@ REPORT_NAMES = {
     "protocol_trends": "defi_protocol_risk_trends.csv",
     "stablecoin_risk": "stablecoin_depeg_risk_top50.csv",
     "stablecoin_trends": "stablecoin_depeg_risk_trends.csv",
+    "alerts": "risk_alerts_latest.csv",
 }
 
 reports = {key: load_report(filename) for key, filename in REPORT_NAMES.items()}
@@ -176,6 +177,7 @@ protocol_risk = reports["protocol_risk"]
 protocol_trends = reports["protocol_trends"]
 stablecoin_risk = reports["stablecoin_risk"]
 stablecoin_trends = reports["stablecoin_trends"]
+risk_alerts = reports["alerts"]
 
 top_stablecoin = stablecoin_risk.iloc[0] if not stablecoin_risk.empty else None
 
@@ -203,11 +205,12 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-metric_1, metric_2, metric_3, metric_4 = st.columns(4)
+metric_1, metric_2, metric_3, metric_4, metric_5 = st.columns(5)
 metric_1.metric("Flagged tokens", len(token_risk))
 metric_2.metric("Flagged protocols", len(protocol_risk))
 metric_3.metric("Tracked stablecoins", len(stablecoin_risk))
-metric_4.metric(
+metric_4.metric("Active alerts", len(risk_alerts))
+metric_5.metric(
     "Peak depeg risk",
     f"{top_risk_score}/100",
     top_risk_symbol if top_stablecoin is not None else "No data",
@@ -227,7 +230,7 @@ def show_empty_trend_state() -> None:
     )
 
 
-tab_tokens, tab_token_trends, tab_protocols, tab_protocol_trends, tab_stablecoins, tab_stablecoin_trends = st.tabs(
+tab_tokens, tab_token_trends, tab_protocols, tab_protocol_trends, tab_stablecoins, tab_stablecoin_trends, tab_alerts = st.tabs(
     [
         "Token liquidity",
         "Token trends",
@@ -235,6 +238,7 @@ tab_tokens, tab_token_trends, tab_protocols, tab_protocol_trends, tab_stablecoin
         "Protocol trends",
         "Stablecoins",
         "Stablecoin trends",
+        "Alerts",
     ]
 )
 
@@ -383,3 +387,37 @@ with tab_stablecoin_trends:
         )
         st.plotly_chart(fig, width="stretch")
         st.dataframe(stablecoin_trends, width="stretch", hide_index=True)
+
+
+with tab_alerts:
+    st.subheader("Risk alerts")
+    if risk_alerts.empty:
+        st.info("No active alerts in the latest pipeline run.")
+    else:
+        st.caption(
+            "Alerts mark high current scores or a risk-score increase of at least "
+            "10 points. Webhook delivery is optional."
+        )
+        alert_chart = risk_alerts.head(20).copy()
+        alert_chart["label"] = (
+            alert_chart["symbol"].astype(str)
+            + " · "
+            + alert_chart["asset_type"].astype(str)
+        )
+        fig = px.bar(
+            alert_chart.sort_values("risk_score"),
+            x="risk_score",
+            y="label",
+            orientation="h",
+            hover_data=[
+                "name",
+                "risk_score_change",
+                "risk_level",
+                "alert_reason",
+                "risk_factors_json",
+            ],
+            title="Current risk alerts",
+            color_discrete_sequence=["#f4b860"],
+        )
+        st.plotly_chart(fig, width="stretch")
+        st.dataframe(risk_alerts, width="stretch", hide_index=True)
