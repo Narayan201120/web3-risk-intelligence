@@ -18,6 +18,34 @@ python src\quality\check_outputs.py
 streamlit run src\dashboard\app.py
 ```
 
+## Runtime container
+
+The repository includes a production-shaped container image. Its default
+command runs the batch pipeline, which is the command a scheduled Cloud Run
+Job should execute:
+
+```powershell
+docker build --tag web3-risk-intelligence:local .
+docker run --rm --env-file .env web3-risk-intelligence:local
+```
+
+The image runs as a non-root user and does not include local data, reports,
+virtual environments, or credentials. Verify the image and its test suite with:
+
+```powershell
+.\scripts\verify_container.ps1
+```
+
+For a dashboard service, override the image command and provide published
+report storage to the service rather than running a second ingestion pipeline:
+
+```powershell
+streamlit run src/dashboard/app.py --server.address=0.0.0.0 --server.port=8080
+```
+
+The container build is also checked by GitHub Actions. Cloud deployment still
+requires a GCP project, registry, service account, and secret configuration.
+
 The first successful run produces the latest reports and empty trend report
 schemas. Run the pipeline again to create comparable snapshots and populate
 the trend reports.

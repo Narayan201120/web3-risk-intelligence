@@ -26,3 +26,9 @@ jobs:
 
       - name: Run tests
         run: python -m pytest -q
+
+      - name: Build runtime container
+        run: docker build --tag web3-risk-intelligence:ci .
+
+      - name: Run tests in runtime container
+        run: docker run --rm --entrypoint python web3-risk-intelligence:ci -m pytest -q

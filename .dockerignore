@@ -1,0 +1,13 @@
+.git
+.github
+.venv
+.agents
+.pytest_cache
+__pycache__
+*.pyc
+data
+reports
+notebooks
+docs/images
+PROGRESS.md
+.env

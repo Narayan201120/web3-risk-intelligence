@@ -1,0 +1,24 @@
+FROM python:3.12-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
+
+WORKDIR /app
+
+COPY requirements.txt ./
+RUN python -m pip install --upgrade pip \
+    && python -m pip install -r requirements.txt \
+    && useradd --create-home --shell /usr/sbin/nologin appuser
+
+COPY src ./src
+COPY tests ./tests
+COPY examples ./examples
+COPY README.md LICENSE ./
+
+RUN mkdir -p data reports \
+    && chown -R appuser:appuser /app
+
+USER appuser
+
+CMD ["python", "src/run_pipeline.py"]
