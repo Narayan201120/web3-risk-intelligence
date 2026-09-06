@@ -46,6 +46,42 @@ streamlit run src/dashboard/app.py --server.address=0.0.0.0 --server.port=8080
 The container build is also checked by GitHub Actions. Cloud deployment still
 requires a GCP project, registry, service account, and secret configuration.
 
+## GCP deployment script
+
+The repository includes an idempotent PowerShell deployment script. It is a
+non-mutating plan by default:
+
+```powershell
+.\scripts\deploy_gcp.ps1 -Plan `
+  -ProjectId YOUR_PROJECT_ID `
+  -BucketName YOUR_UNIQUE_BUCKET_NAME
+```
+
+Apply the plan only after `gcloud auth login` and project permissions have been
+verified:
+
+```powershell
+.\scripts\deploy_gcp.ps1 -Apply `
+  -ProjectId YOUR_PROJECT_ID `
+  -BucketName YOUR_UNIQUE_BUCKET_NAME
+```
+
+The script builds and pushes the image, creates or updates the batch and
+sentinel Cloud Run Jobs, deploys the dashboard service, creates Cloud Scheduler
+triggers, and creates the required service accounts and bucket bindings. It
+does not create a webhook secret. Pass `-WebhookSecretName` only when that
+Secret Manager secret already exists.
+
+The batch and sentinel jobs mount the `data/` and `reports/` prefixes of the
+same Cloud Storage bucket at `/app/data` and `/app/reports`. The dashboard
+mounts only the `reports/` prefix read-only, so it consumes published outputs
+without write access to the data layer.
+
+The CLI flags follow the current Google Cloud interfaces for [Cloud Run Jobs](https://cloud.google.com/run/docs/create-jobs),
+[Cloud Storage volume mounts](https://cloud.google.com/run/docs/configuring/jobs/cloud-storage-volume-mounts),
+[Cloud Run services](https://cloud.google.com/run/docs/configuring/services/cloud-storage-volume-mounts),
+and [scheduled Cloud Run Jobs](https://cloud.google.com/run/docs/execute/jobs-on-schedule).
+
 The first successful run produces the latest reports and empty trend report
 schemas. Run the pipeline again to create comparable snapshots and populate
 the trend reports.

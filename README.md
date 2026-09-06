@@ -232,6 +232,12 @@ required service permissions are documented in
 [docs/deployment.md](docs/deployment.md). No cloud credentials are required to
 run the local pipeline or its tests.
 
+The repository also includes a non-mutating GCP deployment plan:
+
+```powershell
+.\scripts\deploy_gcp.ps1 -Plan -ProjectId YOUR_PROJECT_ID -BucketName YOUR_BUCKET
+```
+
 ## Portfolio Highlights
 
 This project demonstrates:
