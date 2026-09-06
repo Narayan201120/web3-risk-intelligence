@@ -107,6 +107,7 @@ Current reports:
 - `token_liquidity_risk_trends.csv`
 - `defi_protocol_risk_top50.csv`
 - `stablecoin_depeg_risk_top50.csv`
+- `stablecoin_depeg_risk_trends.csv`
 
 ## Dashboard Layer
 
@@ -116,6 +117,7 @@ The Streamlit dashboard reads generated CSV reports and exposes:
 - Token liquidity risk trends
 - DeFi protocol risk rankings
 - Stablecoin depeg risk rankings
+- Stablecoin depeg risk trends
 
 ## Quality Layer
 

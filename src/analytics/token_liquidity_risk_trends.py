@@ -6,6 +6,21 @@ import pandas as pd
 
 SNAPSHOT_ROOT = Path("data/processed_snapshots/coingecko/markets")
 OUTPUT_DIR = Path("reports")
+OUTPUT_PATH = OUTPUT_DIR / "token_liquidity_risk_trends.csv"
+
+OUTPUT_COLUMNS = [
+    "symbol_latest",
+    "name_latest",
+    "liquidity_risk_score_previous",
+    "liquidity_risk_score_latest",
+    "risk_score_change",
+    "market_cap_change_pct",
+    "volume_change_pct",
+    "volume_to_market_cap_ratio_previous",
+    "volume_to_market_cap_ratio_latest",
+    "ingested_at_utc_previous",
+    "ingested_at_utc_latest",
+]
 
 
 RISK_QUERY = """
@@ -78,21 +93,29 @@ from scored
 
 
 def get_snapshot_files() -> list[Path]:
-    files = sorted(SNAPSHOT_ROOT.glob("ingestion_date=*/*.parquet"))
-    if len(files) < 2:
-        raise ValueError(
-            "Need at least two CoinGecko market snapshots to calculate trends. "
-            "Run the pipeline at least twice."
-        )
-    return files
+    return sorted(SNAPSHOT_ROOT.glob("ingestion_date=*/*.parquet"))
 
 
 def score_snapshot(path: Path) -> pd.DataFrame:
     return duckdb.sql(RISK_QUERY, params=[str(path)]).df()
 
 
+def write_empty_report() -> None:
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    pd.DataFrame(columns=OUTPUT_COLUMNS).to_csv(OUTPUT_PATH, index=False)
+
+
 def main() -> None:
     snapshot_files = get_snapshot_files()
+
+    if len(snapshot_files) < 2:
+        write_empty_report()
+        print(
+            "Token liquidity trend report needs at least two snapshots; "
+            f"wrote an empty schema to {OUTPUT_PATH}."
+        )
+        return
+
     previous_path = snapshot_files[-2]
     latest_path = snapshot_files[-1]
 
@@ -110,45 +133,40 @@ def main() -> None:
         - trend["liquidity_risk_score_previous"]
     )
 
-    trend["market_cap_change_pct"] = (
-        (trend["market_cap_latest"] - trend["market_cap_previous"])
-        / trend["market_cap_previous"]
+    trend["market_cap_change_pct"] = pd.NA
+    valid_previous_market_cap = trend["market_cap_previous"] > 0
+    trend.loc[valid_previous_market_cap, "market_cap_change_pct"] = (
+        (
+            trend.loc[valid_previous_market_cap, "market_cap_latest"]
+            - trend.loc[valid_previous_market_cap, "market_cap_previous"]
+        )
+        / trend.loc[valid_previous_market_cap, "market_cap_previous"]
         * 100
     )
 
-    trend["volume_change_pct"] = (
-        (trend["total_volume_latest"] - trend["total_volume_previous"])
-        / trend["total_volume_previous"]
+    trend["volume_change_pct"] = pd.NA
+    valid_previous_volume = trend["total_volume_previous"] > 0
+    trend.loc[valid_previous_volume, "volume_change_pct"] = (
+        (
+            trend.loc[valid_previous_volume, "total_volume_latest"]
+            - trend.loc[valid_previous_volume, "total_volume_previous"]
+        )
+        / trend.loc[valid_previous_volume, "total_volume_previous"]
         * 100
     )
 
-    columns = [
-        "symbol_latest",
-        "name_latest",
-        "liquidity_risk_score_previous",
-        "liquidity_risk_score_latest",
-        "risk_score_change",
-        "market_cap_change_pct",
-        "volume_change_pct",
-        "volume_to_market_cap_ratio_previous",
-        "volume_to_market_cap_ratio_latest",
-        "ingested_at_utc_previous",
-        "ingested_at_utc_latest",
-    ]
-
-    result = trend[columns].sort_values(
+    result = trend[OUTPUT_COLUMNS].sort_values(
         ["risk_score_change", "liquidity_risk_score_latest"],
         ascending=[False, False],
     )
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    output_path = OUTPUT_DIR / "token_liquidity_risk_trends.csv"
-    result.to_csv(output_path, index=False)
+    result.to_csv(OUTPUT_PATH, index=False)
 
     print(f"Previous snapshot: {previous_path}")
     print(f"Latest snapshot: {latest_path}")
     print(result.head(15).to_string(index=False))
-    print(f"\nSaved report to {output_path}")
+    print(f"\nSaved report to {OUTPUT_PATH}")
 
 
 if __name__ == "__main__":

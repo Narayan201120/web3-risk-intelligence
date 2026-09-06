@@ -16,6 +16,7 @@ STEPS = [
     "src/analytics/defi_protocol_risk.py",
     "src/analytics/defi_protocol_risk_trends.py",
     "src/analytics/stablecoin_depeg_risk.py",
+    "src/analytics/stablecoin_depeg_risk_trends.py",
     "src/quality/check_outputs.py",
 ]
 

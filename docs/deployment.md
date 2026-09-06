@@ -1,0 +1,89 @@
+# Deployment and Operations
+
+This project is deliberately runnable without cloud credentials. The local
+pipeline is the reference implementation; a cloud deployment should preserve
+the same raw -> processed -> analytics -> dashboard contract.
+
+## Local release checklist
+
+From the repository root:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\activate
+pip install -r requirements.txt
+python -m pytest
+python src\run_pipeline.py
+python src\quality\check_outputs.py
+streamlit run src\dashboard\app.py
+```
+
+The first successful run produces the latest reports and empty trend report
+schemas. Run the pipeline again to create comparable snapshots and populate
+the trend reports.
+
+## Artifact contract
+
+| Layer | Local path | Cloud equivalent | Retention purpose |
+| --- | --- | --- | --- |
+| Raw | `data/raw/**/*.json` | Cloud Storage raw prefix | Immutable source replay |
+| Latest processed | `data/processed/**/*.parquet` | BigQuery tables or Storage Parquet | Dashboard and current reports |
+| Snapshots | `data/processed_snapshots/**/*.parquet` | Partitioned Storage/BigQuery tables | Historical comparisons |
+| Reports | `reports/*.csv` | BigQuery views or generated objects | Dashboard-ready risk outputs |
+
+All scheduled jobs should write a timestamped raw payload and a processed
+snapshot before publishing a latest table. A failed run must leave the previous
+latest data available and must not overwrite a raw payload.
+
+## GCP deployment plan
+
+The recommended first cloud implementation is:
+
+```text
+Cloud Scheduler
+  -> Cloud Run Jobs: ingestion + processing + analytics + quality
+  -> Cloud Storage: raw JSON, processed Parquet, report CSVs
+  -> Cloud Run service: Streamlit dashboard
+```
+
+For a warehouse-backed phase, load the processed Parquet files into BigQuery
+partitioned by ingestion timestamp. Keep the risk SQL in version control and
+publish reports only after quality checks pass.
+
+### Required service permissions
+
+The scheduled job service account needs:
+
+- outbound HTTPS access to CoinGecko and DefiLlama;
+- `storage.objects.create`, `storage.objects.get`, and
+  `storage.objects.list` on the project bucket;
+- permission to write logs;
+- BigQuery job/table permissions only when the warehouse phase is enabled.
+
+The dashboard service account needs read-only access to the published report
+prefix. It does not need write access to raw or processed data.
+
+No cloud deployment is performed by the local project commands. A GCP project,
+region, bucket, and service-account choice must be supplied before provisioning
+those external resources.
+
+## Scheduling and failure handling
+
+Run the batch at a cadence appropriate to the source rate limits, starting with
+hourly or daily collection. Alert on:
+
+- an ingestion HTTP failure or rate-limit response;
+- a zero-row processed table;
+- a missing or all-null score column;
+- a failed report publish;
+- a trend report remaining empty after the second successful snapshot.
+
+The local `src/quality/check_outputs.py` script is the baseline gate for the
+same checks in CI and in the scheduled job.
+
+## Streaming phase boundary
+
+Streaming exchange trades, order books, or blockchain events should be added as
+a separate ingestion path. They should land in an append-only event topic/table
+and feed short-window aggregates; they should not replace the snapshot-based
+batch reports until latency and data-quality requirements are proven.

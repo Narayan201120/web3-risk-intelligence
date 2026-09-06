@@ -1,0 +1,5 @@
+name_latest,symbol_latest,pegMechanism_latest,depeg_risk_score_previous,depeg_risk_score_latest,risk_score_change,price_previous,price_latest,absolute_depeg_previous,absolute_depeg_latest,circulating_usd_previous,circulating_usd_latest,circulating_change_pct,supply_change_1d_pct_latest,supply_change_7d_pct_latest,chain_count_latest,ingested_at_utc_previous,ingested_at_utc_latest
+Citrea USD,ctUSD,fiat-backed,55,55,0,,,,9793154.43,9793154.43,0.0,-0.18,-58.99,1,20260713T144924Z,20260713T145111Z
+Hermetica USDh,USDH,fiat-backed,53,53,0,,,,2063795.34,2063795.34,0.0,-10.79,-14.95,1,20260713T144924Z,20260713T145111Z
+Lets Get HAI,HAI,crypto-backed,51,51,0,1.273965,1.273965,0.273965,0.273965,447887.14,447887.14,0.0,-0.97,-10.01,1,20260713T144924Z,20260713T145111Z
+pmUSD,pmUSD,crypto-backed,45,45,0,0.690575,0.690575,0.309425,0.309425,64914870.00,64914870.00,0.0,0.0,0.0,1,20260713T144924Z,20260713T145111Z

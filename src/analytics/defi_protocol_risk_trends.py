@@ -5,6 +5,25 @@ import pandas as pd
 
 SNAPSHOT_ROOT = Path("data/processed_snapshots/defillama/protocols")
 OUTPUT_DIR = Path("reports")
+OUTPUT_PATH = OUTPUT_DIR / "defi_protocol_risk_trends.csv"
+
+OUTPUT_COLUMNS = [
+    "name_latest",
+    "symbol_latest",
+    "chain_latest",
+    "category_latest",
+    "protocol_risk_score_previous",
+    "protocol_risk_score_latest",
+    "risk_score_change",
+    "tvl_previous",
+    "tvl_latest",
+    "tvl_change_pct",
+    "change_1d_latest",
+    "change_7d_latest",
+    "audits_latest",
+    "ingested_at_utc_previous",
+    "ingested_at_utc_latest",
+]
 
 RISK_QUERY = """
 with protocol_metrics as (
@@ -70,19 +89,27 @@ from scored
 """
 
 def get_snapshot_files() -> list[Path]:
-    files = sorted(SNAPSHOT_ROOT.glob("ingestion_date=*/*.parquet"))
-    if len(files) < 2:
-        raise ValueError(
-            "Need at least two DeFiLlama protocol snapshots to calculate trends. "
-            "Run the pipeline at least twice. "
-        )
-    return files
+    return sorted(SNAPSHOT_ROOT.glob("ingestion_date=*/*.parquet"))
 
 def score_snapshot(path: Path) -> pd.DataFrame:
     return duckdb.sql(RISK_QUERY, params=[str(path)]).df()
 
+
+def write_empty_report() -> None:
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    pd.DataFrame(columns=OUTPUT_COLUMNS).to_csv(OUTPUT_PATH, index=False)
+
 def main() -> None:
     snapshot_files = get_snapshot_files()
+
+    if len(snapshot_files) < 2:
+        write_empty_report()
+        print(
+            "DeFi protocol trend report needs at least two snapshots; "
+            f"wrote an empty schema to {OUTPUT_PATH}."
+        )
+        return
+
     previous_path = snapshot_files[-2]
     latest_path = snapshot_files[-1]
     
@@ -99,7 +126,7 @@ def main() -> None:
         trend["protocol_risk_score_latest"] - trend["protocol_risk_score_previous"]
     )
     
-    trend["tvl_change_pct"] = None
+    trend["tvl_change_pct"] = pd.NA
     valid_previous_tvl = trend["tvl_previous"] > 0
 
     trend.loc[valid_previous_tvl, "tvl_change_pct"] = (
@@ -109,37 +136,18 @@ def main() -> None:
         * 100
     )
     
-    columns = [
-            "name_latest",
-            "symbol_latest",
-            "chain_latest",
-            "category_latest",
-            "protocol_risk_score_previous",
-            "protocol_risk_score_latest",
-            "risk_score_change",
-            "tvl_previous",
-            "tvl_latest",
-            "tvl_change_pct",
-            "change_1d_latest",
-            "change_7d_latest",
-            "audits_latest",
-            "ingested_at_utc_previous",
-            "ingested_at_utc_latest",
-        ]
-
-    result = trend[columns].sort_values(
+    result = trend[OUTPUT_COLUMNS].sort_values(
         ["risk_score_change", "protocol_risk_score_latest"],
         ascending=[False, False],
     )
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    output_path = OUTPUT_DIR / "defi_protocol_risk_trends.csv"
-    result.to_csv(output_path, index=False)
+    result.to_csv(OUTPUT_PATH, index=False)
 
     print(f"Previous snapshot: {previous_path}")
     print(f"Latest snapshot: {latest_path}")
     print(result.head(15).to_string(index=False))
-    print(f"\nSaved report to {output_path}")
+    print(f"\nSaved report to {OUTPUT_PATH}")
 
 
 if __name__ == "__main__":

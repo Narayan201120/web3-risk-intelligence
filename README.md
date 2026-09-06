@@ -40,7 +40,9 @@ into a cloud-based batch and streaming platform.
 - Generates token liquidity risk reports
 - Generates DeFi protocol risk reports
 - Generates stablecoin depeg risk reports
+- Generates stablecoin depeg trend reports after the second pipeline run
 - Runs pipeline quality checks
+- Includes automated processor, analytics, and pipeline tests
 - Provides an interactive Streamlit dashboard
 
 ## Data Sources
@@ -120,6 +122,7 @@ reports/token_liquidity_risk_trends.csv
 reports/defi_protocol_risk_top50.csv
 reports/defi_protocol_risk_trends.csv
 reports/stablecoin_depeg_risk_top50.csv
+reports/stablecoin_depeg_risk_trends.csv
 ```
 
 These files are ignored by git because they are generated outputs.
@@ -135,6 +138,7 @@ examples/token_liquidity_risk_trends_sample.csv
 examples/defi_protocol_risk_sample.csv
 examples/defi_protocol_risk_trends_sample.csv
 examples/stablecoin_depeg_risk_sample.csv
+examples/stablecoin_depeg_risk_trends_sample.csv
 ```
 
 ## How To Run
@@ -166,12 +170,30 @@ streamlit run src\dashboard\app.py
 
 ## Quality Checks
 
-The pipeline validates that processed datasets and generated reports exist, are
-not empty, and contain expected risk score columns.
+The pipeline validates that processed datasets and latest reports exist, are not
+empty, and contain expected risk score columns. Trend reports are schema-checked
+and may be empty until a second snapshot is available.
 
 ```powershell
 python src\quality\check_outputs.py
 ```
+
+Run the automated tests with:
+
+```powershell
+python -m pytest
+```
+
+The first pipeline run creates the latest reports and schema-valid empty trend
+reports. Trend rows appear automatically after the next run, when two processed
+snapshots are available for comparison.
+
+## Deployment
+
+The local-to-cloud deployment path, artifact contract, scheduling model, and
+required service permissions are documented in
+[docs/deployment.md](docs/deployment.md). No cloud credentials are required to
+run the local pipeline or its tests.
 
 ## Portfolio Highlights
 
@@ -187,9 +209,7 @@ This project demonstrates:
 - Git/GitHub workflow
 - A path toward cloud deployment and streaming data
 
-## Planned Next Steps
+## Future Extensions
 
-- Add stablecoin trend report
-- Add cloud storage and warehouse support
 - Add real-time exchange trade ingestion
 - Add on-chain wallet and token transfer data

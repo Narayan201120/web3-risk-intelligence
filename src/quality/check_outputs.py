@@ -16,6 +16,9 @@ REPORT_FILES = {
     "stablecoin_depeg_risk": Path("reports/stablecoin_depeg_risk_top50.csv"),
     "token_liquidity_risk_trends": Path("reports/token_liquidity_risk_trends.csv"),
     "defi_protocol_risk_trends": Path("reports/defi_protocol_risk_trends.csv"),
+    "stablecoin_depeg_risk_trends": Path(
+        "reports/stablecoin_depeg_risk_trends.csv"
+    ),
 }
 
 def assert_file_exists(path: Path) -> None:
@@ -33,19 +36,25 @@ def assert_parquet_not_empty(name: str, path: Path) -> None:
 
     print(f"{name}: {row_count} rows")
     
-def assert_report_valid(name: str, path: Path, score_column: str) -> None:
+def assert_report_valid(
+    name: str,
+    path: Path,
+    score_column: str,
+    allow_empty: bool = False,
+) -> None:
     df = pd.read_csv(path)
-    
-    if df.empty:
+
+    if df.empty and not allow_empty:
         raise ValueError(f"{name} report is empty: {path}")
     
     if score_column not in df.columns:
         raise ValueError(f"{name} missing score column: {score_column}")
     
-    if df[score_column].isna().all():
+    if not df.empty and df[score_column].isna().all():
         raise ValueError(f"{name} score column is entirely null: {score_column}")
-    
-    print(f"{name}: {len(df)} rows")
+
+    suffix = " (waiting for a second snapshot)" if df.empty else ""
+    print(f"{name}: {len(df)} rows{suffix}")
     
 def main() -> None:
     for name, path in PROCESSED_FILES.items():
@@ -58,11 +67,17 @@ def main() -> None:
         "stablecoin_depeg_risk": "depeg_risk_score",
         "token_liquidity_risk_trends": "risk_score_change",
         "defi_protocol_risk_trends": "risk_score_change",
+        "stablecoin_depeg_risk_trends": "risk_score_change",
     }
-    
+
     for name, path in REPORT_FILES.items():
         assert_file_exists(path)
-        assert_report_valid(name, path, report_score_columns[name])
+        assert_report_valid(
+            name,
+            path,
+            report_score_columns[name],
+            allow_empty=name.endswith("_trends"),
+        )
     
     print("\nAll quality checks passed.")
     
