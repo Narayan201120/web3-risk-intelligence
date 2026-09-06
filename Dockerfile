@@ -9,7 +9,8 @@ WORKDIR /app
 COPY requirements.txt ./
 RUN python -m pip install --upgrade pip \
     && python -m pip install -r requirements.txt \
-    && useradd --create-home --shell /usr/sbin/nologin appuser
+    && groupadd --gid 1000 appuser \
+    && useradd --uid 1000 --gid 1000 --create-home --shell /usr/sbin/nologin appuser
 
 COPY src ./src
 COPY tests ./tests
