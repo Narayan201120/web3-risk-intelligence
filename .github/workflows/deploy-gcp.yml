@@ -1,0 +1,76 @@
+name: Deploy GCP
+
+on:
+  workflow_dispatch:
+    inputs:
+      project_id:
+        description: Google Cloud project ID
+        required: true
+        type: string
+      region:
+        description: Cloud Run and Artifact Registry region
+        required: true
+        default: asia-south1
+        type: string
+      bucket_name:
+        description: Globally unique Cloud Storage bucket name
+        required: true
+        type: string
+      webhook_secret_name:
+        description: Existing Secret Manager secret name, if alerts are enabled
+        required: false
+        type: string
+      public_dashboard:
+        description: Allow unauthenticated dashboard access
+        required: true
+        default: false
+        type: boolean
+
+concurrency:
+  group: gcp-production-deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud with Workload Identity Federation
+        uses: google-github-actions/auth@v3
+        with:
+          project_id: ${{ inputs.project_id }}
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_DEPLOYER_SERVICE_ACCOUNT }}
+
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v3
+
+      - name: Apply deployment
+        shell: pwsh
+        env:
+          PROJECT_ID: ${{ inputs.project_id }}
+          REGION: ${{ inputs.region }}
+          BUCKET_NAME: ${{ inputs.bucket_name }}
+          WEBHOOK_SECRET_NAME: ${{ inputs.webhook_secret_name }}
+          PUBLIC_DASHBOARD: ${{ inputs.public_dashboard }}
+        run: |
+          $arguments = @(
+            "-Apply",
+            "-ProjectId", $env:PROJECT_ID,
+            "-BucketName", $env:BUCKET_NAME,
+            "-Region", $env:REGION
+          )
+          if ($env:WEBHOOK_SECRET_NAME) {
+            $arguments += @("-WebhookSecretName", $env:WEBHOOK_SECRET_NAME)
+          }
+          if ($env:PUBLIC_DASHBOARD -eq "true") {
+            $arguments += "-PublicDashboard"
+          }
+          pwsh ./scripts/deploy_gcp.ps1 @arguments

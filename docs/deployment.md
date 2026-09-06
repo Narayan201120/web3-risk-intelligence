@@ -82,6 +82,22 @@ The CLI flags follow the current Google Cloud interfaces for [Cloud Run Jobs](ht
 [Cloud Run services](https://cloud.google.com/run/docs/configuring/services/cloud-storage-volume-mounts),
 and [scheduled Cloud Run Jobs](https://cloud.google.com/run/docs/execute/jobs-on-schedule).
 
+## GitHub Actions deployment
+
+`.github/workflows/deploy-gcp.yml` exposes the same deployment as a manual
+production workflow. It uses GitHub OIDC and Workload Identity Federation, so
+the repository does not need a long-lived service-account key. Configure these
+GitHub environment secrets before running it:
+
+- `GCP_WORKLOAD_IDENTITY_PROVIDER`: the full provider resource name.
+- `GCP_DEPLOYER_SERVICE_ACCOUNT`: the service account used by the workflow.
+
+The workflow is manual-only, uses the `production` environment, and grants the
+job only `contents: read` and `id-token: write` GitHub permissions. The current
+Google GitHub Actions guidance recommends Workload Identity Federation over
+service-account key JSON; see the [auth action documentation](https://github.com/google-github-actions/auth)
+and [gcloud setup action documentation](https://github.com/google-github-actions/setup-gcloud).
+
 The first successful run produces the latest reports and empty trend report
 schemas. Run the pipeline again to create comparable snapshots and populate
 the trend reports.
