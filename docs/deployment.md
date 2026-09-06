@@ -75,6 +75,19 @@ Cloud Scheduler
   -> Cloud Run service: Streamlit dashboard
 ```
 
+Run the fresh-snapshot sentinel as a separate scheduled job when the batch
+cadence is not sufficient:
+
+```text
+Cloud Scheduler (short cadence)
+  -> Cloud Run Job: python -m src.monitoring.risk_sentinel
+  -> JSON webhook and latest sentinel output
+```
+
+The sentinel checks current token price changes, protocol TVL changes, and USD
+stablecoin peg deviation. It is an early-warning path, not a replacement for
+historical scoring or a validated forecast.
+
 For a warehouse-backed phase, load the processed Parquet files into BigQuery
 partitioned by ingestion timestamp. Keep the risk SQL in version control and
 publish reports only after quality checks pass.

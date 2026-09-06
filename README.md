@@ -43,6 +43,8 @@ into a cloud-based batch and streaming platform.
 - Generates stablecoin depeg trend reports after the second pipeline run
 - Publishes unified risk observations with asset, score, factor, and run metadata
 - Generates local risk alerts with optional webhook delivery
+- Provides a separate fresh-snapshot risk sentinel for sudden price, TVL, and
+  stablecoin peg shocks
 - Runs pipeline quality checks
 - Includes automated processor, analytics, and pipeline tests
 - Provides an interactive Streamlit dashboard
@@ -63,6 +65,7 @@ Public APIs
   -> CSV risk reports
   -> Unified risk observations
   -> Optional risk alerts
+  -> Optional high-frequency risk sentinel
   -> Streamlit dashboard
   -> Run manifest and quality checks
 ```
@@ -199,6 +202,18 @@ table at `data/processed/risk_observations_latest.parquet`. Set
 compatible JSON webhook. `RISK_ALERT_MIN_SCORE` defaults to 50 and
 `RISK_ALERT_MIN_SCORE_CHANGE` defaults to 10. Leave the webhook unset for
 local-only alert files.
+
+Run the separate sentinel path when the batch cadence is not frequent enough:
+
+```powershell
+python -m src.monitoring.risk_sentinel
+```
+
+The sentinel writes `reports/risk_sentinel_latest.json` atomically and can send
+threshold-crossing events to `RISK_SENTINEL_WEBHOOK_URL`. It is designed for a
+short schedule such as every few minutes. Notification state suppresses
+duplicate webhook deliveries while still publishing the full current event
+set. It does not replace the historical batch pipeline.
 
 ## Deployment
 

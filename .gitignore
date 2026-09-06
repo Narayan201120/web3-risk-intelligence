@@ -10,8 +10,10 @@ data/processed/
 data/processes/
 data/processed_snapshots/
 data/runs/
+data/monitoring/
 
 reports/*.csv
+reports/*.json
 
 .env
 PROGRESS.md
